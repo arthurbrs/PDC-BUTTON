@@ -32,7 +32,7 @@ jobs:
           ###### Configuração do Repositório ######
           app_location: "/"  # Diretório onde está o index.html
           api_location: ""   # Nenhuma API no projeto
-          output_location: "" # Deixar vazio para evitar erro de build
+          output_location: "." # Ajustado para corresponder à configuração do Azure
           ###### Fim da Configuração ######
 
   close_pull_request_job:
