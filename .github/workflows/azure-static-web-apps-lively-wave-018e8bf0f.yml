@@ -1,9 +1,9 @@
-name: Azure Static Web Apps CI/CD
+name: Deploy Azure Static Web Apps
 
 on:
   push:
     branches:
-      - main  # Define que o deploy acontece quando houver push na branch main
+      - main
   pull_request:
     branches:
       - main
@@ -13,8 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Upload Static Content
+
+      - name: Deploy Static Web App
         uses: azure/static-web-apps-deploy@v1
         with:
-          app_location: "/"   # Diretório do código-fonte
-          output_location: ""  # Sem build, pois é um site estático
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/"    # Diretório onde está o index.html
+          output_location: ""  # Mantemos vazio para não rodar build
