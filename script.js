@@ -4,26 +4,30 @@ const audioPlayer = document.getElementById("audio-player");
 // 🔹 Substitua pelo seu Storage Account e container
 const blobStorageUrl = "https://eus2pdcbutton.blob.core.windows.net/audios";
 
-// 🔹 Se os blobs forem públicos, carregamos os arquivos diretamente
+// 🔹 Função para buscar arquivos de áudio automaticamente
 async function fetchAudioFiles() {
     try {
-        // Lista de arquivos (se precisar de um backend, podemos adicionar depois)
-        const audioFiles = [
-            "audio1.mp3",
-            "audio2.mp3",
-            "audio3.mp3"
-        ]; // 🔹 Se precisar listar os arquivos dinamicamente, usaremos uma API no futuro
+        const response = await fetch(blobStorageUrl + "?restype=container&comp=list");
+        const text = await response.text();
 
-        if (audioFiles.length === 0) {
+        // 🔹 Extrair os nomes dos arquivos XML retornados pelo Blob Storage
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(text, "application/xml");
+        const blobs = xml.getElementsByTagName("Name");
+
+        if (blobs.length === 0) {
             audioList.innerHTML = "<li>Nenhum áudio encontrado.</li>";
             return;
         }
 
-        // Adiciona os arquivos na lista
-        audioFiles.forEach(file => {
+        // 🔹 Criar lista de áudios dinamicamente
+        blobs.forEach(blob => {
+            const fileName = blob.textContent;
+            const fileUrl = `${blobStorageUrl}/${fileName}`;
+
             const li = document.createElement("li");
-            li.textContent = file;
-            li.onclick = () => playAudio(`${blobStorageUrl}/${file}`);
+            li.textContent = fileName;
+            li.onclick = () => playAudio(fileUrl);
             audioList.appendChild(li);
         });
 
@@ -33,7 +37,7 @@ async function fetchAudioFiles() {
     }
 }
 
-// Função para tocar o áudio selecionado
+// 🔹 Função para tocar o áudio selecionado
 function playAudio(url) {
     audioPlayer.src = url;
     audioPlayer.play();
