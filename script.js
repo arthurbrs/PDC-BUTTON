@@ -4,6 +4,9 @@ const audioPlayer = document.getElementById("audio-player");
 // 🔹 URL do Azure Blob Storage (substitua pelo nome do seu Storage Account e container)
 const blobStorageUrl = "https://eus2pdcbutton.blob.core.windows.net/audios";
 
+// 🔹 Extensões permitidas
+const allowedExtensions = [".mp3", ".ogg"];
+
 // 🔹 Função para buscar arquivos de áudio automaticamente
 async function fetchAudioFiles() {
     try {
@@ -31,11 +34,14 @@ async function fetchAudioFiles() {
             const fileName = blob.textContent;
             const fileUrl = `${blobStorageUrl}/${fileName}`;
 
-            const li = document.createElement("li");
-            li.textContent = fileName.replace(".mp3", ""); // Remove a extensão do nome
-            li.style.cursor = "pointer";
-            li.onclick = () => playAudio(fileUrl);
-            audioList.appendChild(li);
+            // 🔹 Verifica se o arquivo tem extensão permitida
+            if (allowedExtensions.some(ext => fileName.toLowerCase().endsWith(ext))) {
+                const li = document.createElement("li");
+                li.textContent = fileName.replace(/\.(mp3|ogg)$/, ""); // Remove a extensão do nome
+                li.style.cursor = "pointer";
+                li.onclick = () => playAudio(fileUrl);
+                audioList.appendChild(li);
+            }
         });
 
     } catch (error) {
