@@ -1,28 +1,29 @@
 const audioList = document.getElementById("audio-list");
 const audioPlayer = document.getElementById("audio-player");
 
-// 🔹 Altere esta URL para o seu Blob Storage público
-const blobStorageUrl = "https://SEU-STORAGE-ACCOUNT.blob.core.windows.net/audios";
+// 🔹 Substitua pelo seu Storage Account e container
+const blobStorageUrl = "https://eus2pdcbutton.blob.core.windows.net/audios";
 
+// 🔹 Se os blobs forem públicos, carregamos os arquivos diretamente
 async function fetchAudioFiles() {
     try {
-        // 🔹 Chamar a API de listagem do Blob Storage (caso tenha um backend)
-        // Aqui estamos assumindo que os arquivos são publicamente acessíveis
-        const response = await fetch(blobStorageUrl);
-        
-        if (!response.ok) {
-            throw new Error("Erro ao buscar arquivos");
+        // Lista de arquivos (se precisar de um backend, podemos adicionar depois)
+        const audioFiles = [
+            "audio1.mp3",
+            "audio2.mp3",
+            "audio3.mp3"
+        ]; // 🔹 Se precisar listar os arquivos dinamicamente, usaremos uma API no futuro
+
+        if (audioFiles.length === 0) {
+            audioList.innerHTML = "<li>Nenhum áudio encontrado.</li>";
+            return;
         }
-        
-        const data = await response.json();  // Ajuste se necessário
 
-        // Suponha que o backend retorna uma lista JSON com URLs
-        const audioFiles = data.files || [];
-
+        // Adiciona os arquivos na lista
         audioFiles.forEach(file => {
             const li = document.createElement("li");
-            li.textContent = file.name;
-            li.onclick = () => playAudio(file.url);
+            li.textContent = file;
+            li.onclick = () => playAudio(`${blobStorageUrl}/${file}`);
             audioList.appendChild(li);
         });
 
@@ -32,10 +33,11 @@ async function fetchAudioFiles() {
     }
 }
 
+// Função para tocar o áudio selecionado
 function playAudio(url) {
     audioPlayer.src = url;
     audioPlayer.play();
 }
 
-// 🔹 Buscar os áudios ao carregar a página
+// 🔹 Carregar áudios ao iniciar a página
 fetchAudioFiles();
