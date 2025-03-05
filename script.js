@@ -1,7 +1,7 @@
 const audioList = document.getElementById("audio-list");
 const audioPlayer = document.getElementById("audio-player");
 
-// 🔹 URL do Azure Blob Storage (substitua pelo nome do seu Storage Account e container)
+// 🔹 URL do Azure Blob Storage
 const blobStorageUrl = "https://eus2pdcbutton.blob.core.windows.net/audios";
 
 // 🔹 Extensões permitidas
@@ -17,36 +17,34 @@ async function fetchAudioFiles() {
         }
 
         const text = await response.text();
-
-        // 🔹 Extrair os nomes dos arquivos XML retornados pelo Blob Storage
         const parser = new DOMParser();
         const xml = parser.parseFromString(text, "application/xml");
         const blobs = xml.getElementsByTagName("Name");
 
         if (blobs.length === 0) {
-            audioList.innerHTML = "<li>Nenhum áudio encontrado.</li>";
+            audioList.innerHTML = "<p>Nenhum áudio encontrado.</p>";
             return;
         }
 
-        // 🔹 Criar lista de áudios dinamicamente
-        audioList.innerHTML = ""; // Limpa a lista antes de adicionar novos itens
+        // 🔹 Criar botões para cada arquivo de áudio
+        audioList.innerHTML = "";
         Array.from(blobs).forEach(blob => {
             const fileName = blob.textContent;
             const fileUrl = `${blobStorageUrl}/${fileName}`;
 
             // 🔹 Verifica se o arquivo tem extensão permitida
             if (allowedExtensions.some(ext => fileName.toLowerCase().endsWith(ext))) {
-                const li = document.createElement("li");
-                li.textContent = fileName.replace(/\.(mp3|ogg)$/, ""); // Remove a extensão do nome
-                li.style.cursor = "pointer";
-                li.onclick = () => playAudio(fileUrl);
-                audioList.appendChild(li);
+                const button = document.createElement("button");
+                button.textContent = fileName.replace(/\.(mp3|ogg)$/, ""); // Remove a extensão
+                button.classList.add("audio-button"); // Adiciona classe CSS para estilizar
+                button.onclick = () => playAudio(fileUrl);
+                audioList.appendChild(button);
             }
         });
 
     } catch (error) {
         console.error("Erro ao buscar áudios:", error);
-        audioList.innerHTML = `<li>Erro ao carregar áudios: ${error.message}</li>`;
+        audioList.innerHTML = `<p>Erro ao carregar áudios: ${error.message}</p>`;
     }
 }
 
